@@ -7,6 +7,9 @@ app.get('/', (req, res) => {
     res.send('Hello, world!');
 });
 
+app.post('/nf', (req, res) => {
+});
+
 app.listen(port, () => {
     console.log(`Example app listening in port ${port}`);
 });
