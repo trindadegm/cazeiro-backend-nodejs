@@ -6,6 +6,11 @@ test("Create Nota Fiscal", async t => {
     await t.test("Example", async t => {
         console.log("Example");
         let test = await got.get('http://localhost:3080');
-        assert(test.statusCode == 200, "Test request failed");
+        assert(test.statusCode == 200, 'Test request failed');
+    });
+
+    await t.test("Create empty", async t => {
+        let result = await got.post('http://localhost:3080/v1/nf');
+        assert(result.statusCode == 200, 'Failed to create a new empty NF');
     });
 });

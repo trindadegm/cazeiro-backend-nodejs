@@ -7,7 +7,14 @@ app.get('/', (req, res) => {
     res.send('Hello, world!');
 });
 
-app.post('/nf', (req, res) => {
+var allNf = []
+
+app.post('/v1/nf', (req, res) => {
+    allNf.push({});
+    res.statusCode = 200;
+    res.send({
+        id: allNf.length - 1,
+    });
 });
 
 app.listen(port, () => {
