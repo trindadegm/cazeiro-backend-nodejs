@@ -1,4 +1,5 @@
 import express from 'express';
+import { MongoClient } from 'mongodb';
 
 const app = express();
 const port = 3080;
@@ -17,6 +18,22 @@ app.post('/v1/nf', (req, res) => {
     });
 });
 
-app.listen(port, () => {
-    console.log(`Example app listening in port ${port}`);
-});
+const dburi = 'mongodb://127.0.0.1:27017';
+const client = new MongoClient(dburi);
+
+async function run() {
+    console.log('Running');
+    try {
+        await client.connect();
+        await client.db('admin').command({ ping: 1 });
+        console.log('Connected successfully to database');
+
+        app.listen(port, () => {
+            console.log(`Example app listening in port ${port}`);
+        });
+    } finally {
+        await client.close();
+    }
+}
+
+await run().catch(console.dir);
