@@ -1,39 +1,38 @@
 import express from 'express';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
 const app = express();
 const port = 3080;
 
-app.get('/', (req, res) => {
-    res.send('Hello, world!');
-});
-
-var allNf = []
-
-app.post('/v1/nf', (req, res) => {
-    allNf.push({});
-    res.statusCode = 200;
-    res.send({
-        id: allNf.length - 1,
-    });
-});
-
 const dburi = 'mongodb://127.0.0.1:27017';
-const client = new MongoClient(dburi);
+const client = new MongoClient(dburi, { serverApi: ServerApiVersion.v1 });
 
-async function run() {
-    console.log('Running');
+await client.connect();
+
+const db = client.db('ordoka');
+
+await db.command({ ping: 1 });
+
+app.get('/', async (req, res) => {
+    const dbResponse = await db.collection('nfs').findOne({});
+    res.send(dbResponse);
+});
+
+app.post('/v1/nf', async (req, res) => {
     try {
-        await client.connect();
-        await client.db('admin').command({ ping: 1 });
-        console.log('Connected successfully to database');
-
-        app.listen(port, () => {
-            console.log(`Example app listening in port ${port}`);
+        const dbRes = await db.collection('nfs').insertOne({});
+        res.statusCode = 200;
+        res.send({
+            id: dbRes.insertedId,
         });
-    } finally {
-        await client.close();
+    } catch (e) {
+        res.statusCode = 500;
+        res.send();
     }
-}
+});
 
-await run().catch(console.dir);
+app.listen(port, () => {
+    console.log(`Example app listening in port ${port}`);
+}).on('exit', async () => {
+    await client.close();
+});
