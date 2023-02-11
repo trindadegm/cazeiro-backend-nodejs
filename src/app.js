@@ -22,6 +22,7 @@ app.post('/v1/nf', async (req, res) => {
     try {
         const dbRes = await db.collection('nfs').insertOne({});
         res.statusCode = 200;
+        res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
         res.send({
             id: dbRes.insertedId,
         });
