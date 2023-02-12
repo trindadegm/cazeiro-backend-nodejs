@@ -20,6 +20,7 @@
   "homepage": "https://github.com/trindadegm/cazeiro-backend-nodejs#readme",
   "dependencies": {
     "express": "^4.18.2",
+    "jsonschema": "^1.4.1",
     "mongodb": "^5.0.1"
   },
   "devDependencies": {
