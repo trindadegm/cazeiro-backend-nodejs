@@ -22,13 +22,14 @@ app.get('/', async (req, res) => {
 });
 
 app.post('/v1/nf', async (req, res) => {
+    // This is a workaround for now
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     if (req.is('application/json')) {
         if (validateNf(req.body).valid) {
             const toInsert = req.body;
             try {
                 const dbRes = await db.collection('nfs').insertOne(toInsert);
                 res.statusCode = 200;
-                res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
                 res.send({
                     id: dbRes.insertedId,
                 });
