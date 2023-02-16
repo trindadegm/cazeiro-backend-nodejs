@@ -21,35 +21,46 @@ app.get('/', async (req, res) => {
     res.send(dbResponse);
 });
 
-app.post('/v1/nf', async (req, res) => {
-    // This is a workaround for now
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-    if (req.is('application/json')) {
-        if (validateNf(req.body).valid) {
-            const toInsert = req.body;
-            try {
-                const dbRes = await db.collection('nfs').insertOne(toInsert);
-                res.statusCode = 200;
-                res.send({
-                    id: dbRes.insertedId,
+const nfRouter = express.Router();
+
+nfRouter
+    .use((req, res, next) => {
+        res
+            .setHeader('Access-Control-Allow-Origin', '*')
+            .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept')
+            .setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+        next();
+    })
+    .route('/v1/nf')
+    .post(async (req, res) => {
+        if (req.is('application/json')) {
+            const validationResult = validateNf(req.body);
+            if (validationResult.valid) {
+                const toInsert = req.body;
+                try {
+                    const dbRes = await db.collection('nfs').insertOne(toInsert);
+                    res.status(200).send({
+                        id: dbRes.insertedId,
+                    });
+                } catch (e) {
+                    res.status(500).send();
+                }
+            } else {
+                res.status(400).send({
+                    error_description: 'Invalid object, verify schema: ' + JSON.stringify(validationResult.errors),
                 });
-            } catch (e) {
-                res.statusCode = 500;
-                res.send();
             }
         } else {
-            res.statusCode = 400;
-            res.send({
-                error_description: 'Invalid object, verify schema',
+            res.status(415).send({
+                error_description: 'Content-Type must be JSON',
             });
         }
-    } else {
-        res.statusCode = 415;
-        res.send({
-            error_description: 'Content-Type must be JSON',
-        });
-    }
-});
+    })
+    .options((req, res) => {
+        res.status(200).send();
+    });
+
+app.use(nfRouter);
 
 app.listen(port, () => {
     console.log(`Example app listening in port ${port}`);
