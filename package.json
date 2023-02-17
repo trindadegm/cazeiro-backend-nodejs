@@ -5,7 +5,7 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "node tests/integration.js",
+    "test": "node tests/tests.js",
     "start": "node src/app.js"
   },
   "repository": {
